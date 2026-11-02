@@ -1,0 +1,46 @@
+{% extends "lessons/base.html" %}
+{% load static %}
+{% block content %}
+    <section class="next-lesson">
+        {% if next_lesson %}
+            <p class="label">Next lesson</p>
+            <h1>{{ next_lesson.scheduled_at|date:"l, F j" }}</h1>
+            <p class="time">{{ next_lesson.scheduled_at|date:"g:i A" }} · in {{ next_lesson.scheduled_at|timeuntil }}</p>
+        {% else %}
+            <p class="label">Next lesson</p>
+            <h1>Not scheduled yet</h1>
+        {% endif %}
+    </section>
+    <section>
+        <h2>Assignments</h2>
+        {% for piece in pieces %}
+            <details class="piece"{% if forloop.first %} open{% endif %}>
+                <summary>
+                    <span class="piece-title">{{ piece.title }}{% if piece.composer %} <small>{{ piece.composer }}</small>{% endif %}</span>
+                    <span class="piece-progress"><span class="done">{{ piece.done }}</span>/{{ piece.target }}</span>
+                </summary>
+                {% for a in piece.assignments.all %}
+                    <div class="assignment{% if a.done >= a.target_count %} complete{% endif %}"
+                         data-url="{% url 'check_assignment' a.pk %}">
+                        <div class="a-title">{{ a.title }}{% if a.technique and a.get_technique_display|lower != a.title|lower %} <span class="tag">{{ a.get_technique_display }}</span>{% endif %}</div>
+                        <div class="circles">
+                            {% for filled in a.circles %}
+                                <button type="button"
+                                        class="circle{% if filled %} filled{% endif %}"
+                                        aria-label="Mark one repetition done"></button>
+                            {% endfor %}
+                        </div>
+                        <p class="feedback" aria-live="polite"></p>
+                    </div>
+                {% empty %}
+                    <p class="empty">No assignments for this piece yet.</p>
+                {% endfor %}
+            </details>
+        {% empty %}
+            <p class="empty">No pieces assigned yet.</p>
+        {% endfor %}
+    </section>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'lessons/app.js' %}" defer></script>
+{% endblock %}

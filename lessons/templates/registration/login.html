@@ -1,0 +1,11 @@
+{% extends "lessons/base.html" %}
+{% block content %}
+    <section class="login">
+        <h1>Log in</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="primary">Log in</button>
+        </form>
+    </section>
+{% endblock %}
